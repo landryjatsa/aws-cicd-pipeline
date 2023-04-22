@@ -1,10 +1,25 @@
 version: 0.2
+
 phases:
   pre_build:
     commands:
       - terraform init
       - terraform validate
-  
+
   build:
     commands:
       - terraform plan
+      - terraform apply -auto-approve
+      - terraform destroy -auto-approve
+      # Add the following line to set the ArtifactsOverride
+      - aws s3 cp output.tfplan s3://my-bucket/my-folder/output.tfplan
+      # The name and path in the command above should be updated to match your specific configuration
+      artifacts:
+        files:
+          - output.tfplan
+        name: MyOutputArtifact
+        discard-paths: yes
+        base-directory: './'
+        artifact-type: codepipeline
+        # Add the following line to set the ArtifactsOverride
+        artifact: MyOutputArtifact.zip
